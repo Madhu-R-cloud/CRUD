@@ -14,21 +14,14 @@ mongoose.connect('mongodb://localhost:27017/bookstore', {
 
 const db = mongoose.connection;
 
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const bookRoutes = require('../node-book-api/routes/BookRoutes'); 
 
 app.use('/books', bookRoutes);
-// app.use('/create', bookRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-// app.get('/', (req,res)=>{
-//     res.send("Hii Madhu....")
-// })
