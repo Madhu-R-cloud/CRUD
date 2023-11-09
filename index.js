@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const bookRoutes = require('./routes/BookRoutes'); 
 
-app.use('/books', bookRoutes);
+app.use('/api/books', bookRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -4,11 +4,12 @@ module.exports = {
     getAllBooks: async (req, res) => {
         try {
             const books = await Book.find();
-            if (books) {
-                res.status(200).send(books);
+            if (books=='') {
+               return res.status(400).send( {message : "Books Not found, Insert Books"});
+                
             }
-            else {
-                res.status(400).send("Books Not found, Insert Books");
+            else { 
+                res.status(200).send(books);
             }
 
         } catch (error) {
@@ -20,14 +21,19 @@ module.exports = {
         try {
             const { title, author, summary } = req.body;
             if (!title || !author || !summary) {
-                return res.status(400).send('Bad Request: Empty input');
+                return res.status(400).send({message : 'Empty input, Title, Author, Summery fields are mandatory'});
             }
+        
+            if (!isNaN(author)) {
+                return res.send({ message: "Author name should not be a number. Please enter a valid user name." });
+            }
+            
             const newBook = new Book({ title, author, summary });
         
             await newBook.save();
             return res.status(201).json({ message: "Book Added Successfully, Here is the New Book Title and Author details",  title: newBook.title,
-            author: newBook.author
-          });
+            author: newBook.author, summary : newBook.summary});
+
         } catch (error) {
            return res.status(500).json({ error: error.message });
         }
@@ -44,7 +50,7 @@ module.exports = {
                return res.status(404).json({ message: 'Book not found' });
             }
         }else{
-            return res.status(404).json({ message: 'Enter Parameter ID to find a Book' });
+            return res.status(404).json({ message: 'Enter ID to find a Book' });
         }
             
         } catch (error) {
@@ -60,17 +66,20 @@ module.exports = {
             if (!title || !author || !summary || !id ) {
                 return res.status(400).send('Bad Request: Empty input');
             }
+            if (!isNaN(author)) {
+                return res.send({ message: "Author name should not be a number. Please enter a valid user name." });
+            }
             const updatedBook = await Book.findByIdAndUpdate(id, { title, author, summary }, { new: true });
             // const filteredBook = {
             //     title: updatedBook.title,
             //     author: updatedBook.author,
             //     summary: updatedBook.summary
             // };
-        
+          
             if (updatedBook) {
                 return res.status(200).json(updatedBook);
             } else {
-               return res.status(404).json({ message: 'Book not found to update, Insert new Book and update'});
+               return res.status(404).json({ message: 'Book not found to update, Insert new Book and then update'});
             }
         } catch (error) {
            return res.status(500).json({ error: error.message });
@@ -78,15 +87,20 @@ module.exports = {
     },
 
 
-
     deleteBook: async (req, res) => {
         try {
-            const deletedBook = await Book.findByIdAndDelete(req.params.id);
+            const id = req.params.id;
+            if(id){
+                const deletedBook = await Book.findByIdAndDelete(id);
             if (deletedBook) {
-                res.status(200).json({ message: 'Book deleted successfully' });
+               return res.status(200).json({ message: 'Book deleted successfully' });
             } else {
-                res.status(404).json({ message: 'Book not found' });
+                return res.status(404).json({ message: 'Book not found' });
             }
+        }else{
+            return res.status(404).json({ message: 'Enter Book ID to delete a perticuler Book' })
+        }
+            
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
